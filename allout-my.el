@@ -24,7 +24,7 @@
 
 (defun my-allout-hook ()
   (define-key allout-mode-map "C"))
-;;; 
+
 ;; (add-hook 'outline-mode-hook 'rf-allout-font-lock-hook)
 ;;;_#25 which-func mode
 

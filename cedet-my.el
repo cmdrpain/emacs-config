@@ -1,33 +1,27 @@
- (load-file (concat pkg-dir "cedet/common/cedet.el"))
-;; (require 'srecode-load)
-;; (require 'srecode-cpp)
-;;(semantic-load-enable-excessive-code-helpers)
-;; (require 'semanticdb-global)
-;; (semantic-load-enable-semantic-debugging-helpers)
-;;  (global-semantic-idle-completions-mode)
-;; (global-semantic-idle-tag-highlight-mode t)
 
+(setq semantic-load-turn-useful-things-on t)
+
+(setq srecode-insert-ask-variable-method 'field
+      semanticdb-find-default-throttle '(project unloaded system)
+      semantic-idle-scheduler-no-working-message nil
+      semantic-idle-scheduler-verbose-flag nil
+      semantic-idle-scheduler-idle-time 2
+      semantic-idle-scheduler-work-idle-time 100
+      semantic-idle-work-parse-neighboring-files-flag nil)
+
+ (load-file (concat pkg-dir "cedet/common/cedet.el"))
 
 (require 'semantic-ia)
 (require 'semantic-gcc)
 (require 'eassist)
 
-
-
-(global-ede-mode t)
-(global-semantic-tag-folding-mode 1)
-;; (global-semantic-idle-summary-mode 1)
-(global-semantic-idle-scheduler-mode 1)
+(global-ede-mode 1)
 (semantic-load-enable-gaudy-code-helpers)
 
-(setq srecode-insert-ask-variable-method 'field)
-(setq semanticdb-find-default-throttle '(project unloaded system))
-
-(setq semantic-idle-scheduler-no-working-message t)
-(setq semantic-idle-scheduler-verbose-flag nil)
-(setq semantic-idle-scheduler-idle-time 2)
-(setq semantic-idle-scheduler-work-idle-time 10)
-(setq semantic-idle-work-parse-neighboring-files-flag nil)
+(global-semantic-tag-folding-mode 1)
+(global-semantic-idle-summary-mode -1)
+(global-semantic-idle-scheduler-mode 1)
+(global-semantic-idle-completions-mode -1)
 
 
 (setq qt4-base-dir "/usr/include/Qt")
@@ -44,28 +38,39 @@
 
 (defun my-cedet-mode-hook ()
   (srecode-minor-mode 1)
-  (local-set-key [(meta tab)] 'eassist-list-methods)
-  (local-set-key [(control \;)] 'semantic-ia-complete-symbol-menu)
-  ;; (local-set-key [(meta return)] 'semantic-analyze-proto-impl-toggle)
-  (local-set-key [(meta shift return)] 'semantic-ia-show-summary)
-  (local-set-key [(shift return)] 'semantic-ia-show-doc)
-  (local-set-key [(control \')] 'semantic-symref)
-  (local-set-key [(meta p)] 'senator-previous-tag)
-  (local-set-key [(meta n)] 'senator-next-tag)
-  ;; (semantic-new-buffer-fcn)
   ;; (ede-minor-mode 1)
-  ;; (semantic-idle-summary-mode 1)
-  ;; (semantic-idle-scheduler-mode 1)
   ;; (semantic-tag-folding-mode 1)
-  ;; (semantic-load-enable-gaudy-code-helpers)
+  ;; (semantic-idle-scheduler-mode 1)
+  ;; (semantic-idle-summary-mode nil)
+  ;; (semantic-idle-completions-mode nil)
   )
 
+(dolist (elt
+	 '((anything-imenu . [(meta tab)])
+	   (semantic-ia-complete-symbol-menu . [(control \;)])
+	   (semantic-ia-show-summary . [(meta shift return)])
+	   ;; (semantic-ia-show-doc . [(shift return)])
+	   (semantic-symref . [(control \')])
+	   (senator-previous-tag . [(meta p)])
+	   (senator-next-tag . [(meta n)])
+	   (semantic-ia-complete-symbol . [(control return)])
+	   (semantic-tag-folding-show-children . "\C-vs")
+	   (semantic-tag-folding-show-children . "\C-v\C-s")
+	   (semantic-tag-folding-show-all . "\C-vS")
+	   (semantic-tag-folding-fold-children . "\C-vh")
+	   (semantic-tag-folding-fold-children . "\C-v\C-h")
+	   (semantic-tag-folding-fold-all . "\C-vH")))
+  (define-key senator-mode-map (cdr elt) (car elt)))
+
+
 (mapcar #'(lambda (mode) (add-hook mode 'my-cedet-mode-hook))
-	'(c-mode-common-hook emacs-lisp-mode-hook matlab-mode-hook))
+	'(c-mode-common-hook emacs-lisp-mode-hook))
 
 
 ;;; Don't load semantic in the following modes/buffers:
 (add-hook 'semantic-inhibit-functions
 	  '(lambda ()
-	     (or (string-match "Lisp" (prin1-to-string major-mode))
+	     (or (string-match "*scratch*" (buffer-name))
+		 (string-match "Slime" (prin1-to-string major-mode))
+		 (string-match "Lisp" (prin1-to-string major-mode))
 		 (string-match "python-mode" (prin1-to-string major-mode)))))

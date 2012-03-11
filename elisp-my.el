@@ -40,3 +40,11 @@
 
 (ad-disable-advice 'message 'before 'when-was-that)
 (ad-update 'message)
+
+
+;;; eldoc
+(my-add-hooks '(emacs-lisp-mode-hook
+		inferior-lisp-mode-hook)
+	      'eldoc-mode)
+
+

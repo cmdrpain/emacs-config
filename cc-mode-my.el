@@ -3,34 +3,43 @@
   (local-set-key "\C-c\C-b" nil)
   (local-set-key [f6] 'eassist-switch-h-cpp)
   (local-set-key [(meta return)] 'semantic-analyze-proto-impl-toggle)
-  (local-set-key [(control return)] 'semantic-ia-complete-symbol)
-  (local-set-key "\C-vs" 'semantic-tag-folding-show-children)
-  (local-set-key "\C-v\C-s" 'semantic-tag-folding-show-children)
-  (local-set-key "\C-vS" 'semantic-tag-folding-show-all)
-  (local-set-key "\C-vh" 'semantic-tag-folding-fold-children)
-  (local-set-key "\C-v\C-h" 'semantic-tag-folding-fold-children)
-  (local-set-key "\C-vH" 'semantic-tag-folding-fold-all)
   (local-set-key (kbd "RET") 'newline-and-indent)
   (local-set-key [(control c) / /] 'srecode-insert)
   (c-set-style "linux")
   (cwarn-mode)
   (c-toggle-auto-newline -1)
   (subword-mode 1)
-  (company-mode)
-  (linum-mode 1)
-  (add-to-list 'c-cleanup-list 'space-before-funcall)
-  (paren-toggle-open-paren-context 1)
-  (parenthesis-register-keys "(\"{" c-mode-base-map t)
-  (parenthesis-register-keys "" c-mode-base-map)
+  ;; (add-to-list 'c-cleanup-list 'space-before-funcall)
   ;; (font-lock-add-keywords 'c++-mode '(("[\\<\\(Q_OBJECT\|Q_INTERFACES\\(.*\\)\\|public slots\\|public signals\\|private slots\\|private signals\\|protected slots\\|protected signals\\)\\>" . font-lock-constant-face)))
-  (set-fill-column 80)
   )
+
+(add-hook 'c-mode-common-hook 'my-c-mode-hook)
+
 ;; (defun my-c++-mode-hook ()
 ;;   (define-key c++-mode-map (kbd "<f7>") 'kdab-insert-header)
 ;;   (define-key c++-mode-map (kbd "<S-f7>") 'kdab-insert-forward-decl)
 ;;   (define-key c++-mode-map (kbd "<C-f7>") 'kdab-lookup-qt-documentation))
-(add-hook 'c-mode-common-hook 'fci-mode)
-(add-hook 'c-mode-common-hook 'my-c-mode-hook)
+;; (add-hook 'c-mode-common-hook 'fci-mode)
+
 ;; (require 'doc-mode)
 ;; (add-hook 'c-mode-common-hook 'doc-mode)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

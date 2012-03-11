@@ -2,11 +2,19 @@
   "Minor mode for pseudo-structurally editing Lisp code."
   t)
 
+(defun paredit-hook ()
+  (highlight-parentheses-mode t)
+  (paredit-mode t))
+
 (mapc (lambda (x) (let ((mode (intern (concat (symbol-name x) "-mode-hook"))))
-		    (add-hook mode (lambda () (progn
-						(highlight-parentheses-mode t)
-						(paredit-mode t))))))
-      '(newlisp slime-repl slime emacs-lisp inferior-lisp))
+		    (add-hook mode 'paredit-hook)))
+      '(slime-repl slime emacs-lisp inferior-lisp ielm))
+
+
+(eval-after-load "eldoc"
+  '(eldoc-add-command
+    'paredit-backward-delete
+    'paredit-close-round))
 
 (eval-after-load "paredit"
   '(progn

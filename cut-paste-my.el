@@ -1,3 +1,5 @@
+;;; made obsolete by auto-indent-mode
+
 (defvar yank-indent-modes '(emacs-lisp-mode
                             c-mode c++-mode
                             tcl-mode sql-mode

@@ -5,8 +5,6 @@
       TeX-parse-self t
       TeX-maoster nil)
 
-
-
 (eval-after-load "tex"
   '(progn
      (add-to-list 'TeX-command-list
@@ -62,7 +60,6 @@
 ;; (autoload 'cdlatex-mode "cdlatex" "CDLaTeX Mode" t)
 ;; (autoload 'turn-on-cdlatex "cdlatex" "CDLaTeX Mode" nil)
 
-(add-hook 'LaTeX-mode-hook 'auto-fill-mode)
 (add-hook 'LaTeX-mode-hook 'flyspell-mode)
 (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
 

@@ -1,5 +1,5 @@
 ;;Time-stamp: <2009-03-12 21:50:37 andy>
-
+(require 'cl)
 ;;; Global variables
 (setq home-dir "/home/andy/")
 (setq lisp-dir (concat home-dir "elisp/"))
@@ -21,7 +21,7 @@
 	(TeX-master . t)
 	(TeX-master . "master")))
 
-;;; Turn off nagging/unneded things 
+;;; Turn off nagging/unneded things
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
 (put 'narrow-to-region 'disabled nil)
@@ -43,12 +43,6 @@
 (setq indent-tabs-mode nil)
 
 (put 'narrow-to-page 'disabled nil)
-
-;;; recentf
-(require 'recentf)
-;;; needed to remove tramp asking for a password unnecessarily (e.g. at startup)
-(setq recentf-auto-cleanup 'never)
-(recentf-mode 1)
 
 (setq history-length 250)
 
@@ -82,78 +76,114 @@
 
 (add-to-list 'load-path lisp-dir)
 (add-to-list 'load-path (concat site-lisp-dir "auctex/"))
-;; Don't add mylisp-dir to load-path
-;; (add-to-list 'load-path mylisp-dir)
-(my-add-contents-to-load-path elpa-dir)
-(my-add-contents-to-load-path pkg-dir)
-;; (my-add-contents-to-load-path (concat pkg-dir "cedet"))
+(defun my-update-load-path ()
+  (interactive)
+  (my-add-contents-to-load-path pkg-dir))
 
+(my-update-load-path)
 
 ;;; elpa
- (when
-     (load
-      (expand-file-name  (concat elpa-dir "package.el")))
-   (package-initialize))
 
 (if (not (boundp 'package-archives))
     (setq package-archives nil))
 
 (add-to-list 'package-archives
-	     '("marmalade" . "http://marmalade-repo.org/packages/"))
+	     '("marmalade" . "http://marmalade-repo.org/packages/")
+	     '("gnu" . "http://elpa.gnu.org/"))
+
+(when
+     (load
+      (expand-file-name  (concat elpa-dir "package.el")))
+   (package-initialize))
 
 ;;; reset the info search path, since this fucks up my dir node
 (setq Info-directory-list '("/usr/share/info"))
 
 (require 'info+)
-
 (require 'moccur-edit)
 (require 'color-moccur)
+(require 'color-occur)
 (require 'incr)
 (require 'iedit)
 (require 'magit)
-(require 'fill-column-indicator)
-(set-fill-column 80)
-(setq fci-style 'rule)
+
 ;;; load my customizations
 (flet ((load-file (x) (load (concat mylisp-dir x))))
+    (load-file "common-my")
     (load-file "backup-my")
+    (load-file "editing-my")
     ;; should be before cc-mode, as it require mic-paren
     (load-file "visuals-my")
-    (load-file "company-my")
+    ;; (load-file "company-my")
+    (load-file "yasnippet-my")
+    (load-file "autocomplete-my")
+    (load-file "autopair-my")
+    (load-file "anything-my")
+    ;; this doesn't work too good yet. I need to investigate some
+    ;; surprising behaviour
+   ;; (load-file "autoindent-my")
     (load-file "cc-mode-my")
     (load-file "lacarte-my")
     ;; doesn't work: prints "Process is not running for buffer "
     ;; (load-file "wcheck-mode-my")
-    ;; (load-file "cedet-my")
+    (load-file "cedet-my")
     (load-file "cmake-my")
     (load-file "cut-paste-my")
     (load-file "dired-my")
-    (load-file "functions-my")
-    (load-file "global-hooks-my")
-    (load-file "global-keys-my")
     (load-file "icicles-my")
     (load-file "latex-my")
-    (load-file "matlab-my")
+    (load-file "octave-my")
+    ;; (load-file "matlab-my")
+    (load-file "session-my")
     (load-file "paredit-my")
     (load-file "screen-my")
-    (load-file "session-my")
     (load-file "slime-my")
     (load-file "uniquify-my")
     (load-file "woman-my")
-    (load-file "debug-elisp-my")
+    (load-file "elisp-my")
     ;; (load-file "python-my")
-    ;; (load-file "yasnippet-my")
+    (load-file "projects-my")
+    (load-file "window-management-my")
     (load-file "org-mode-my")
-    )
-
+    (load-file "global-hooks-my")
+    (load-file "global-keys-my"))
 
 ;;; workaround to some bug
 (setq warning-suppress-types nil)
 
-;;; lisp
-(add-hook 'lisp-mode-hook '(lambda nil (linum-mode 1)))
-(add-hook 'emacs-lisp-mode-hook '(lambda nil (eldoc-mode 1) (company-mode 1)))
+;;; ack
+(autoload 'ack-same "full-ack" nil t)
+(autoload 'ack "full-ack" nil t)
+(setq ack-prompt-for-directory t)
+;;; way too slow
+;; (autoload 'ack-find-same-file "full-ack" nil t)
+;; (autoload 'ack-find-file "full-ack" nil t)
 
+
+;;; browsing
+(setq browse-url-browser-function 'browse-url-firefox
+      browse-url-firefox-new-window-is-tab t)
+
+;;; findr
+(autoload 'findr "findr" "Find file name." t)
+(autoload 'findr-search "findr" "Find text in files." t)
+(autoload 'findr-query-replace "findr" "Replace text in files." t)
+
+;;; gnuplot
+(autoload 'gnuplot-mode "gnuplot" "gnuplot major mode" t)
+(autoload 'gnuplot-make-buffer "gnuplot" "open a buffer in gnuplot mode" t)
+(add-to-list 'auto-mode-alist '("\\.gp$" . gnuplot-mode))
+
+
+;;; keyfreq
+(require 'keyfreq)
+(keyfreq-mode 1)
+(keyfreq-autosave-mode 1)
+
+;;; lua
+(autoload 'lua-mode "lua-mode" "Lua major mode")
+(add-to-list 'auto-mode-alist '("\\.lua$" . lua-mode))
+(eval-after-load "lua-mode" '(load "flymakelua.el"))
 
 ;;; doxymacs
 ;; (require 'doxymacs)
@@ -162,18 +192,17 @@
 ;;       (doxymacs-font-lock)))
 ;; (add-hook 'font-lock-mode-hook 'my-doxymacs-font-lock-hook)
 
-(global-font-lock-mode t)
-;;; findr
+;;; mode-compile - wrapper around compile
+;;; doesn't really work as fine as it should
+;; (autoload 'mode-compile "mode-compile"
+;;   "Command to compile current buffer file based on the major mode" t)
+;; (autoload 'mode-compile-kill "mode-compile"
+;;   "Command to kill a compilation launched by `mode-compile'" t)
+;; (global-set-key "\C-ck" 'mode-compile-kill)
 
-(autoload 'findr "findr" "Find file name." t)
-(autoload 'findr-search "findr" "Find text in files." t)
-(autoload 'findr-query-replace "findr" "Replace text in files." t)
-
-
-;;; gnuplot
-(autoload 'gnuplot-mode "gnuplot" "gnuplot major mode" t)
-(autoload 'gnuplot-make-buffer "gnuplot" "open a buffer in gnuplot mode" t)
-(add-to-list 'auto-mode-alist '("\\.gp$" . gnuplot-mode))
+;;; popwin - makes annoying pop-up buffers less annoying
+(require 'popwin)
+(setq display-buffer-function 'popwin:display-buffer)
 
 ;;; pkgbuild-mode
 (autoload 'pkgbuild-mode "pkgbuild-mode" "PKGBUILD mode." t)
@@ -182,19 +211,14 @@
 ;;; shell
 (add-to-list 'auto-mode-alist '("/etc/profile" . shell-script-mode))
 
-;;; browsing
-(setq browse-url-browser-function (quote browse-url-kde))
+;;; switch-window
+(require 'switch-window)
 
 ;;; view-mode
 (define-key view-mode-map "q" 'bury-buffer)
 
-;;; lua
-(autoload 'lua-mode "lua-mode" "Lua major mode")
-(add-to-list 'auto-mode-alist '("\\.lua$" . lua-mode))
-(eval-after-load "lua-mode" '(load "flymakelua.el"))
 
 ;;; wesnoth mode
-
 (autoload 'wesnoth-mode "wesnoth-mode" "Major mode for editing WML." t)
 (add-to-list 'auto-mode-alist '("\\.cfg\\'" . wesnoth-mode))
 
@@ -216,45 +240,37 @@
 
 (if (fboundp 'ede-version)
     (eval-after-load "ede-cpp-root"
-      (progn
-	(setq golem-prefix "~/downloads/amiga/amikit-good/Work/")
-	(ede-cpp-root-project "golem"
-			      :file (concat golem-prefix "golem/smakefile")
-			      :include-path '(".")
-			      :system-include-path (list
-						    (concat golem-prefix "sc/include")
-						    (concat golem-prefix "include/"))
-			      :spp-table '( ("STATIC" . "static")
-					    ("CONST" . "const")
-					    ("VOID" . "void")
-					    ("GLOBAL" . "extern")
-					    ("IMPORT" . "extern")
-					    ("REGISTER" . "register")
-					    )
-			      :spp-files
-			      '("golem_macros.h" "golem_dirs.h" "golem_strings.h" "golem.h")
-			      ))))
+      (ignore-errors
+	  (progn
+	    (setq golem-prefix "~/downloads/amiga/amikit-good/Work/")
+	    (ede-cpp-root-project "golem"
+				  :file (concat golem-prefix "golem/smakefile")
+				  :include-path '(".")
+				  :system-include-path (list
+							(concat golem-prefix "sc/include")
+							(concat golem-prefix "include/"))
+				  :spp-table '( ("STATIC" . "static")
+						("CONST" . "const")
+						("VOID" . "void")
+						("GLOBAL" . "extern")
+						("IMPORT" . "extern")
+						("REGISTER" . "register")
+						)
+				  :spp-files
+				  '("golem_macros.h" "golem_dirs.h" "golem_strings.h" "golem.h")
+				  )))))
 
-
-;;(save-buffers-kill-emacs)
-
-
+(setq custom-file "~/.emacs.d/custom.el")
+(load custom-file 'noerror)
 (custom-set-variables
   ;; custom-set-variables was added by Custom.
   ;; If you edit it by hand, you could mess it up, so be careful.
   ;; Your init file should contain only one such instance.
   ;; If there is more than one, they won't work right.
- '(bibtex-entry-field-alist (quote (("Article" ((("author" "Author1 [and Author2 ...] [and others]") ("title" "Title of the article (BibTeX converts it to lowercase)") ("journal" "Name of the journal (use string, remove braces)") ("year" "Year of publication")) (("volume" "Volume of the journal") ("number" "Number of the journal (only allowed if entry contains volume)") ("pages" "Pages in the journal") ("month" "Month of the publication as a string (remove braces)") ("note" "Remarks to be put at the end of the \\bibitem"))) ((("author" "Author1 [and Author2 ...] [and others]") ("title" "Title of the article (BibTeX converts it to lowercase)")) (("pages" "Pages in the journal") ("journal" "Name of the journal (use string, remove braces)") ("year" "Year of publication") ("volume" "Volume of the journal") ("number" "Number of the journal") ("month" "Month of the publication as a string (remove braces)") ("note" "Remarks to be put at the end of the \\bibitem")))) ("Book" ((("author" "Author1 [and Author2 ...] [and others]" nil t) ("editor" "Editor1 [and Editor2 ...] [and others]" nil t) ("title" "Title of the book") ("publisher" "Publishing company") ("year" "Year of publication")) (("volume" "Volume of the book in the series") ("number" "Number of the book in a small series (overwritten by volume)") ("series" "Series in which the book appeared") ("address" "Address of the publisher") ("edition" "Edition of the book as a capitalized English word") ("month" "Month of the publication as a string (remove braces)") ("note" "Remarks to be put at the end of the \\bibitem"))) ((("author" "Author1 [and Author2 ...] [and others]" nil t) ("editor" "Editor1 [and Editor2 ...] [and others]" nil t) ("title" "Title of the book")) (("publisher" "Publishing company") ("year" "Year of publication") ("volume" "Volume of the book in the series") ("number" "Number of the book in a small series (overwritten by volume)") ("series" "Series in which the book appeared") ("address" "Address of the publisher") ("edition" "Edition of the book as a capitalized English word") ("month" "Month of the publication as a string (remove braces)") ("note" "Remarks to be put at the end of the \\bibitem")))) ("Booklet" ((("title" "Title of the booklet (BibTeX converts it to lowercase)")) (("author" "Author1 [and Author2 ...] [and others]") ("howpublished" "The way in which the booklet was published") ("address" "Address of the publisher") ("month" "Month of the publication as a string (remove braces)") ("year" "Year of publication") ("note" "Remarks to be put at the end of the \\bibitem")))) ("InBook" ((("author" "Author1 [and Author2 ...] [and others]" nil t) ("editor" "Editor1 [and Editor2 ...] [and others]" nil t) ("title" "Title of the book") ("chapter" "Chapter in the book") ("publisher" "Publishing company") ("year" "Year of publication")) (("volume" "Volume of the book in the series") ("number" "Number of the book in a small series (overwritten by volume)") ("series" "Series in which the book appeared") ("type" "Word to use instead of \"chapter\"") ("address" "Address of the publisher") ("edition" "Edition of the book as a capitalized English word") ("month" "Month of the publication as a string (remove braces)") ("pages" "Pages in the book") ("note" "Remarks to be put at the end of the \\bibitem"))) ((("author" "Author1 [and Author2 ...] [and others]" nil t) ("editor" "Editor1 [and Editor2 ...] [and others]" nil t) ("title" "Title of the book") ("chapter" "Chapter in the book")) (("pages" "Pages in the book") ("publisher" "Publishing company") ("year" "Year of publication") ("volume" "Volume of the book in the series") ("number" "Number of the book in a small series (overwritten by volume)") ("series" "Series in which the book appeared") ("type" "Word to use instead of \"chapter\"") ("address" "Address of the publisher") ("edition" "Edition of the book as a capitalized English word") ("month" "Month of the publication as a string (remove braces)") ("note" "Remarks to be put at the end of the \\bibitem")))) ("InCollection" ((("author" "Author1 [and Author2 ...] [and others]") ("title" "Title of the article in book (BibTeX converts it to lowercase)") ("booktitle" "Name of the book") ("publisher" "Publishing company") ("year" "Year of publication")) (("editor" "Editor1 [and Editor2 ...] [and others]") ("volume" "Volume of the book in the series") ("number" "Number of the book in a small series (overwritten by volume)") ("series" "Series in which the book appeared") ("type" "Word to use instead of \"chapter\"") ("chapter" "Chapter in the book") ("pages" "Pages in the book") ("address" "Address of the publisher") ("edition" "Edition of the book as a capitalized English word") ("month" "Month of the publication as a string (remove braces)") ("note" "Remarks to be put at the end of the \\bibitem"))) ((("author" "Author1 [and Author2 ...] [and others]") ("title" "Title of the article in book (BibTeX converts it to lowercase)") ("booktitle" "Name of the book")) (("pages" "Pages in the book") ("publisher" "Publishing company") ("year" "Year of publication") ("editor" "Editor1 [and Editor2 ...] [and others]") ("volume" "Volume of the book in the series") ("number" "Number of the book in a small series (overwritten by volume)") ("series" "Series in which the book appeared") ("type" "Word to use instead of \"chapter\"") ("chapter" "Chapter in the book") ("address" "Address of the publisher") ("edition" "Edition of the book as a capitalized English word") ("month" "Month of the publication as a string (remove braces)") ("note" "Remarks to be put at the end of the \\bibitem")))) ("InProceedings" ((("author" "Author1 [and Author2 ...] [and others]") ("title" "Title of the article in proceedings (BibTeX converts it to lowercase)") ("booktitle" "Name of the conference proceedings") ("year" "Year of publication")) (("editor" "Editor1 [and Editor2 ...] [and others]") ("volume" "Volume of the conference proceedings in the series") ("number" "Number of the conference proceedings in a small series (overwritten by volume)") ("series" "Series in which the conference proceedings appeared") ("pages" "Pages in the conference proceedings") ("address" "Location of the Proceedings") ("month" "Month of the publication as a string (remove braces)") ("organization" "Sponsoring organization of the conference") ("publisher" "Publishing company, its location") ("note" "Remarks to be put at the end of the \\bibitem"))) ((("author" "Author1 [and Author2 ...] [and others]") ("title" "Title of the article in proceedings (BibTeX converts it to lowercase)")) (("booktitle" "Name of the conference proceedings") ("pages" "Pages in the conference proceedings") ("year" "Year of publication") ("editor" "Editor1 [and Editor2 ...] [and others]") ("volume" "Volume of the conference proceedings in the series") ("number" "Number of the conference proceedings in a small series (overwritten by volume)") ("series" "Series in which the conference proceedings appeared") ("address" "Location of the Proceedings") ("month" "Month of the publication as a string (remove braces)") ("organization" "Sponsoring organization of the conference") ("publisher" "Publishing company, its location") ("note" "Remarks to be put at the end of the \\bibitem")))) ("Manual" ((("title" "Title of the manual")) (("author" "Author1 [and Author2 ...] [and others]") ("organization" "Publishing organization of the manual") ("address" "Address of the organization") ("edition" "Edition of the manual as a capitalized English word") ("month" "Month of the publication as a string (remove braces)") ("year" "Year of publication") ("note" "Remarks to be put at the end of the \\bibitem")))) ("MastersThesis" ((("author" "Author1 [and Author2 ...] [and others]") ("title" "Title of the master's thesis (BibTeX converts it to lowercase)") ("school" "School where the master's thesis was written") ("year" "Year of publication")) (("type" "Type of the master's thesis (if other than \"Master's thesis\")") ("address" "Address of the school (if not part of field \"school\") or country") ("month" "Month of the publication as a string (remove braces)") ("note" "Remarks to be put at the end of the \\bibitem")))) ("Misc" (nil (("author" "Author1 [and Author2 ...] [and others]") ("title" "Title of the work (BibTeX converts it to lowercase)") ("howpublished" "The way in which the work was published") ("month" "Month of the publication as a string (remove braces)") ("year" "Year of publication") ("note" "Remarks to be put at the end of the \\bibitem")))) ("PhdThesis" ((("author" "Author1 [and Author2 ...] [and others]") ("title" "Title of the PhD. thesis") ("school" "School where the PhD. thesis was written") ("year" "Year of publication")) (("type" "Type of the PhD. thesis") ("address" "Address of the school (if not part of field \"school\") or country") ("month" "Month of the publication as a string (remove braces)") ("note" "Remarks to be put at the end of the \\bibitem")))) ("Proceedings" ((("title" "Title of the conference proceedings") ("year" "Year of publication")) (("booktitle" "Title of the proceedings for cross references") ("editor" "Editor1 [and Editor2 ...] [and others]") ("volume" "Volume of the conference proceedings in the series") ("number" "Number of the conference proceedings in a small series (overwritten by volume)") ("series" "Series in which the conference proceedings appeared") ("address" "Location of the Proceedings") ("month" "Month of the publication as a string (remove braces)") ("organization" "Sponsoring organization of the conference") ("publisher" "Publishing company, its location") ("note" "Remarks to be put at the end of the \\bibitem")))) ("TechReport" ((("author" "Author1 [and Author2 ...] [and others]") ("title" "Title of the technical report (BibTeX converts it to lowercase)") ("institution" "Sponsoring institution of the report") ("year" "Year of publication")) (("type" "Type of the report (if other than \"technical report\")") ("number" "Number of the technical report") ("address" "Address of the institution (if not part of field \"institution\") or country") ("month" "Month of the publication as a string (remove braces)") ("note" "Remarks to be put at the end of the \\bibitem")))) ("Unpublished" ((("author" "Author1 [and Author2 ...] [and others]") ("title" "Title of the unpublished work (BibTeX converts it to lowercase)") ("note" "Remarks to be put at the end of the \\bibitem")) (("month" "Month of the publication as a string (remove braces)") ("year" "Year of publication")))) ("online" ((("title" "Title of the online resource") ("url" "An URL to the online resource")) (("author" "Author1 [and Author2 ...] [and others]") ("editor" "") ("year" "Year of publication") ("date" "") ("subtitle" "") ("titleaddon" "") ("language" "") ("version" "") ("note" "") ("organization" "") ("month" "") ("year" "") ("addendum" "") ("pubstate" "") ("urldate" "")))))))
- '(safe-local-variable-values (quote ((Package . CL-UNICODE) (Base . 10) (Package . CL-PPCRE) (Syntax . COMMON-LISP) (ispell-dictionary . "polish") (mode . latex) (TeX-master . t) (TeX-master . "master"))))
- '(saint/iswitchb-highlight-modes-alist (quote (("Dired" . 1) ("Info" . 2) ("Fundamental" . 3) ("Completions" . 3) ("Org" . 4)))))
-
+ '(safe-local-variable-values (quote ((Syntax . Common-Lisp) (Package . CL-UNICODE) (Base . 10) (Package . CL-PPCRE) (Syntax . COMMON-LISP) (ispell-dictionary . "polish") (mode . latex) (TeX-master . t) (TeX-master . "master")))))
 (custom-set-faces
   ;; custom-set-faces was added by Custom.
   ;; If you edit it by hand, you could mess it up, so be careful.
   ;; Your init file should contain only one such instance.
   ;; If there is more than one, they won't work right.
- '(magit-diff-add ((((class color) (background dark)) (:foreground "green"))))
- '(magit-diff-del ((((class color) (background light)) (:foreground "red")) (((class color) (background dark)) (:foreground "red"))))
- '(magit-diff-hunk-header ((t (:inherit magit-header :box (:line-width 1 :color "blue")))))
- '(magit-item-highlight ((((class color) (background dark)) (:background "grey12"))))
  )

@@ -8,18 +8,20 @@
 (global-set-key [f1] 'woman)
 (global-set-key [f5] 'switch-to-previous-buffer)
 (global-set-key [f7] #'(lambda () (interactive) (revert-buffer nil t)))
-;;; i prefer allout mode for now
-;; (global-set-key [f7] 'fold-dwim-toggle)
-;; (global-set-key [(shift F7)] 'fold-dwim-hide-all)
-;; (global-set-key [(control F7)] 'fold-dwim-show-all)
+
+(global-set-key [f8] 'fold-dwim-toggle)
+(global-set-key [(shift F8)] 'fold-dwim-hide-all)
+(global-set-key [(control F8)] 'fold-dwim-show-all)
+;;(global-set-key [f8] 'iedit-mode)
+
 (global-set-key [(f9)] 'compile)
 (global-set-key [(shift f10)] 'indent-whole-buffer)
 (global-set-key [(control meta f11)] 'reload-emacs-config)
-(global-set-key [f11] 'incr-dwim) 
+(global-set-key [f11] 'incr-dwim)
 (global-set-key [f12] 'tool-bar-mode)
 
 (global-set-key [(control x) (control \;)] 'repeat-complex-command)
-(global-set-key [(super o)] 'other-window)
+(global-set-key [(super o)] 'switch-window)
 (global-set-key "\C-x\C-r" 'find-file-at-point)
 (global-set-key "\M-]" 'scroll-up)
 (global-set-key "\M-[" 'scroll-down)
@@ -43,12 +45,15 @@
 (global-set-key "\C-c\C-k" 'kill-region)
 (global-set-key "\C-x\C-k" 'kill-region)
 (global-set-key "\C-co" 'moccur)
+
+
+(global-set-key "\C-c\C-o" 'moccur)
 ;;(global-set-key "\C-xr" 'recentf-open-more-files)
 (global-set-key "\C-x\C-m" 'execute-extended-command)
 (global-set-key "\C-xm" 'execute-extended-command)
 (global-set-key "\M-o\M-o" 'font-lock-fontify-buffer)
 (global-set-key "\M-;" 'comment-dwim) ;
-(global-set-key [f8] 'iedit-mode)
+
 
 ;; (global-set-key [M-up] 'enlarge-window)
 ;; (global-set-key [M-right] 'other-window)

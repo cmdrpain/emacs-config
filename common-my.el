@@ -70,7 +70,27 @@
       (beginning-of-line))))
 
 
-(defvar base-dir "~/vbcc/targets/m68k-amigaos/include/clib")
+(defun my-add-hooks (hook-list hook)
+  "Add HOOK to modes in HOOK-LIST."
+  (dolist (elt hook-list)
+    (add-hook elt hook)))
+
+(defmacro eval-if-featurep (feature-list warn err &rest body)
+  "Eval BODY if all features in quoted FEATURE-LIST is present, otherwise
+issue warn if WARN is non-nil or error if
+ERR is non-nil. ERR takes precedence if both are non-nil."
+  (let ((elt (make-symbol "elt"))
+	(ok (make-symbol "ok")))
+    `(let ((,ok t))
+       (dolist (,elt ,feature-list)
+	 (unless (featurep ,elt)
+	   (cond (,err (error "Package %s is not available" ,elt))
+		 (,warn (warn "Package %s is not available" ,elt)))
+	   (setq ,ok nil)))
+       (when ,ok
+	 (progn
+	   ,@body)))))
+
 
 ;; (defun dired-highlight-dirs-ucs-code-point ()
 ;;   (interactive)

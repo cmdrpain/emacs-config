@@ -11,8 +11,7 @@
 (defun my-matlab-mode-hook ()
   (set-fill-column 80)
   (local-set-key "\M-;" 'comment-dwim)
-  (local-set-key "\C-c//" 'srecode-insert)
-  (linum-mode 1))
+  (local-set-key "\C-c//" 'srecode-insert))
 
 (add-hook 'matlab-mode-hook 'my-matlab-mode-hook)
 
